@@ -56,7 +56,6 @@ function MSearchBar() {
   };
 
   const handleSearch = async (event) => {
-    debugger
     event.preventDefault();
     setLoading(true);
     setError(null);
@@ -78,7 +77,7 @@ function MSearchBar() {
 
   return (
     <Box>
-      <Search component="form" onSubmit={() => handleSearch}>
+      <Search component="form" onSubmit={handleSearch}>
         <SearchIconWrapper>
           <SearchIcon />
         </SearchIconWrapper>
@@ -94,14 +93,18 @@ function MSearchBar() {
       {error && <Typography color="error">{error}</Typography>}
 
       <List>
-        {searchResults.map((movie) => (
-          <ListItem key={movie.id}>
-            <ListItemText
-              primary={movie.title}
-              secondary={movie.release_date}
-            />
-          </ListItem>
-        ))}
+        {searchResults && searchResults.length > 0 ? (
+          searchResults.map((movie) => (
+            <ListItem key={movie.id}>
+              <ListItemText
+                primary={movie.title}
+                secondary={movie.release_date}
+              />
+            </ListItem>
+          ))
+        ) : (
+          <Typography>No results found</Typography>
+        )}
       </List>
     </Box>
   );

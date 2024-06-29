@@ -11,6 +11,8 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemButton from "@mui/material/ListItemButton";
 import Skeleton from "@mui/material/Skeleton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import useMovie from "../hooks/useMovie"; // Import useMovie
+
 const yearList = [
   { id: 2000, label: "2000" },
   { id: 2010, label: "2010" },
@@ -19,14 +21,16 @@ const yearList = [
   { id: 2022, label: "2022" },
   { id: 2023, label: "2023" },
 ];
+
 export default function Category() {
   const [openYear, setOpenYear] = React.useState(false);
   const [openGenres, setOpenGenres] = React.useState(true);
-  const [loading, setLoading] = React.useState();
+  const [loading, setLoading] = React.useState(false);
   const [genresList, setGenresList] = React.useState([]);
-  const [movieList, setMovieList] = React.useState([]);
   const [genreId, setGenreId] = React.useState();
   const [yearId, setYearId] = React.useState(2000);
+
+  const { setMovie, movieList, isLoading } = useMovie(); // Sử dụng hook useMovie
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,6 +47,7 @@ export default function Category() {
     };
     fetchData();
   }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       let url = `discover/movie?api_key=${API_KEY}&language=en-US&append_to_response=videos`;
@@ -51,12 +56,12 @@ export default function Category() {
         if (genreId) {
           setYearId(null);
           const res = await apiService.get(`${url}&with_genres=${genreId}`);
-          setMovieList(res.data.results);
+          setMovie(res.data.results); // Sử dụng setMovie để cập nhật danh sách phim
         }
         if (yearId) {
           setGenreId(null);
           const res = await apiService.get(`${url}&year=${yearId}`);
-          setMovieList(res.data.results);
+          setMovie(res.data.results); // Sử dụng setMovie để cập nhật danh sách phim
         }
 
         setLoading(false);
@@ -65,7 +70,7 @@ export default function Category() {
       }
     };
     fetchData();
-  }, [genreId, yearId]);
+  }, [genreId, yearId, setMovie]);
 
   const placeholder = [0, 1, 2, 3];
   const detailSkeleton = (
@@ -74,6 +79,7 @@ export default function Category() {
       <Skeleton variant="rectangular" width="100%" height={300} />
     </Stack>
   );
+
   return (
     <>
       <Typography variant="h5" my={3}>
@@ -111,7 +117,9 @@ export default function Category() {
                   noWrap: true,
                   fontSize: 12,
                   lineHeight: "16px",
-                  color: openGenres ? "rgba(0,0,0,0)" : "rgba(255,255,255,0.5)",
+                  color: openGenres
+                    ? "rgba(0,0,0,0)"
+                    : "rgba(255,255,255,0.5)",
                 }}
                 sx={{ my: 0 }}
               />
@@ -216,11 +224,13 @@ export default function Category() {
                   {detailSkeleton}
                 </Grid>
               ))
-            : movieList.map((item) => (
-                <Grid item xs={10} sm={6} md={4} lg={3}>
-                  <MCard key={item.id} item={item} />
+            : movieList && movieList.length > 0
+            ? movieList.map((item) => (
+                <Grid item xs={10} sm={6} md={4} lg={3} key={item.id}>
+                  <MCard item={item} />
                 </Grid>
-              ))}
+              ))
+            : <Typography>No movies found</Typography>}
         </Grid>
       </Stack>
     </>
