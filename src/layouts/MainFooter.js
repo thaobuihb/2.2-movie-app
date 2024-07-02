@@ -10,7 +10,6 @@ function MainFooter() {
       p={1}
       mt={2}
     >
-      {"Copyright © "}
       <Link color="inherit" href="https://github.com/thaobuihb">
         I'm Thao
       </Link>{" "}

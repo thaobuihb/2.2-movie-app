@@ -7,20 +7,47 @@ import PaginationItem from "@mui/material/PaginationItem";
 import Divider from "@mui/material/Divider";
 import Skeleton from "@mui/material/Skeleton";
 import "./TrendingCardGroup.css"; // Import CSS riêng cho trending
+import { API_KEY, BASE_URL } from "../api/config";
 
-function TrendingCardGroup({ trendingList, loadingTrending }) {
+function TrendingCardGroup() {
+  const [trendingList, setTrendingList] = useState([]);
+  const [loadingTrending, setLoadingTrending] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 2;
+
+  useEffect(() => {
+    const fetchTrending = async () => {
+      try {
+        const response = await fetch(
+          `${BASE_URL}/trending/movie/day?language=en-US&api_key=${API_KEY}`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setTrendingList(data.results);
+          setLoadingTrending(false);
+        } else {
+          setLoadingTrending(false);
+          console.error("Failed to fetch trending movies");
+        }
+      } catch (error) {
+        setLoadingTrending(false);
+        console.error("Error fetching trending movies:", error);
+      }
+    };
+
+    fetchTrending();
+  }, []);
 
   const getDisplayedItems = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return trendingList.slice(startIndex, startIndex + itemsPerPage);
   };
 
-  useEffect(() => {
-    // Reset page to 1 whenever trendingList changes
-    setCurrentPage(1);
-  }, [trendingList]);
+  const handleNextPage = () => {
+    setCurrentPage((prev) =>
+      prev * itemsPerPage >= trendingList.length ? 1 : prev + 1
+    );
+  };
 
   const placeholder = [0, 1];
   const detailSkeleton = (
@@ -40,14 +67,7 @@ function TrendingCardGroup({ trendingList, loadingTrending }) {
         <Typography variant="h5" my={3}>
           TRENDING
         </Typography>
-        <PaginationItem
-          type="next"
-          onClick={() =>
-            setCurrentPage((prev) =>
-              prev * itemsPerPage >= trendingList.length ? 1 : prev + 1
-            )
-          }
-        />
+        <PaginationItem type="next" onClick={handleNextPage} />
       </Stack>
       <Divider />
       <Grid container justifyContent="center" spacing={3} mt={2}>
@@ -59,7 +79,7 @@ function TrendingCardGroup({ trendingList, loadingTrending }) {
             ))
           : getDisplayedItems().map((item) => (
               <Grid key={item.id} item xs={12} md={6}>
-                <div className="trending-card"> {/* Div bọc thẻ trending */}
+                <div className="trending-card">
                   <MCard item={item} />
                 </div>
               </Grid>

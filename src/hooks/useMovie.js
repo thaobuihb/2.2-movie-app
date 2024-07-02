@@ -7,13 +7,13 @@ const useMovie = () => {
   function setMovie(data) {
     setState((prevState) => ({
       ...prevState,
-      movieList: data, // Thay đổi state.movieList thành data
+      movieList: data, 
     }));
   }
 
   return {
     setMovie,
-    movieList: state.movieList, // Sửa thành movieList
+    movieList: state.movieList, 
     isLoading: state.isLoading,
   };
 };

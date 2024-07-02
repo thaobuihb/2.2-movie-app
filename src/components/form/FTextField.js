@@ -17,7 +17,7 @@ function FTextField({ name, label, ...other }) {
           fullWidth
           error={!!error}
           helperText={error?.message}
-          {...field} // field is most important to get user input
+          {...field} 
           {...other}
         />
       )}
