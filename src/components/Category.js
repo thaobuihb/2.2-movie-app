@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import apiService from "../api/apiServices";
 import { API_KEY } from "../api/config";
 import Grid from "@mui/material/Grid";
@@ -30,7 +30,10 @@ export default function Category() {
   const [genreId, setGenreId] = useState();
   const [yearId, setYearId] = useState(2000);
   const { setMovie, movieList, isLoading } = useMovie();
-  const [searchResults, setSearchResults] = useState([]); 
+  const [searchResults, setSearchResults] = useState([]);
+  
+  const prevGenreId = useRef();
+  const prevYearId = useRef();
 
   // Fetch genres list
   useEffect(() => {
@@ -55,17 +58,18 @@ export default function Category() {
       let url = `discover/movie?api_key=${API_KEY}&language=en-US&append_to_response=videos`;
       try {
         setLoading(true);
-        if (genreId) {
+        if (genreId && genreId !== prevGenreId.current) {
           setYearId(null);
           const res = await apiService.get(`${url}&with_genres=${genreId}`);
           setMovie(res.data.results);
           setSearchResults([]); // Clear search results
-        }
-        if (yearId) {
+          prevGenreId.current = genreId;
+        } else if (yearId && yearId !== prevYearId.current) {
           setGenreId(null);
           const res = await apiService.get(`${url}&year=${yearId}`);
           setMovie(res.data.results);
           setSearchResults([]); // Clear search results
+          prevYearId.current = yearId;
         }
         setLoading(false);
       } catch (e) {
@@ -73,7 +77,7 @@ export default function Category() {
       }
     };
     fetchData();
-  }, [genreId, yearId], [movieList]);
+  }, [genreId, yearId, setMovie]);
 
   const placeholder = [0, 1, 2, 3];
   const detailSkeleton = (
