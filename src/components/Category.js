@@ -73,7 +73,7 @@ export default function Category() {
       }
     };
     fetchData();
-  }, [genreId, yearId]);
+  }, [genreId, yearId], [movieList]);
 
   const placeholder = [0, 1, 2, 3];
   const detailSkeleton = (
