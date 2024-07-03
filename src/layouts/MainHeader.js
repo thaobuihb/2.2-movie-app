@@ -4,6 +4,7 @@ import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
+import MovieSearchBar from "../components/MovieSearchBar";
 
 import Logo from "../components/Logo";
 import { useAuth } from "../contexts/AuthContext";
@@ -22,10 +23,8 @@ function MainHeader() {
             sx={{ mr: 2 }}
           >
             <Logo />
+            <MovieSearchBar/>
           </IconButton>
-          <Typography variant="h6" color="inherit" component="div">
-            Home Cine
-          </Typography>
           <Box sx={{ flexGrow: 1 }} />
           <Typography variant="h6" color="inherit" component="div">
             Welcome {user?.username}!
