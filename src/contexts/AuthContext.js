@@ -1,42 +1,107 @@
-import React, { useState, useContext, createContext } from "react";
+import { createContext, useReducer, useEffect, useContext } from "react";
 
-// Define the initial context type
-const AuthContextType = {
-  user: "",
-  signin: null,
-  signout: null,
+const initialState = {
+  isAuthenticated: false,
+  isInitialized: false,
+  user: null,
 };
 
-// Create the context
-const AuthContext = createContext(AuthContextType);
+const INITIALIZE = "INITIALIZE";
+const LOGIN_SUCCESS = "LOGIN_SUCCESS";
+const LOGOUT = "LOGOUT";
 
-// AuthProvider component
-export function AuthProvider({ children }) {
-  // State to hold the user information
-  const [user, setUser] = useState("");
+const reducer = (state, action) => {
+  switch (action.type) {
+    case INITIALIZE:
+      const { isAuthenticated, user } = action.payload;
+      return {
+        ...state,
+        isAuthenticated,
+        isInitialized: true,
+        user,
+      };
+    case LOGIN_SUCCESS:
+      return {
+        ...state,
+        isAuthenticated: true,
+        user: action.payload.user,
+      };
+    case LOGOUT:
+      return {
+        ...state,
+        isAuthenticated: false,
+        user: null,
+      };
+    default:
+      return state;
+  }
+};
 
-  // Function to sign in a user
-  const signin = (newUser, callback) => {
-    setUser(newUser);
-    callback(); // Optional callback function
+const AuthContext = createContext({ ...initialState });
+
+function AuthProvider({ children }) {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  useEffect(() => {
+    const initialize = async () => {
+      try {
+        const username = window.localStorage.getItem("username");
+
+        if (username) {
+          dispatch({
+            type: INITIALIZE,
+            payload: { isAuthenticated: true, user: { username } },
+          });
+        } else {
+          dispatch({
+            type: INITIALIZE,
+            payload: { isAuthenticated: false, user: null },
+          });
+        }
+      } catch (err) {
+        console.error(err);
+        dispatch({
+          type: INITIALIZE,
+          payload: {
+            isAuthenticated: false,
+            user: null,
+          },
+        });
+      }
+    };
+    initialize();
+  }, []);
+
+  const login = async (username, callback) => {
+    window.localStorage.setItem("username", username);
+    dispatch({
+      type: LOGIN_SUCCESS,
+      payload: { user: { username } },
+    });
+    callback();
   };
 
-  // Function to sign out a user
-  const signout = (callback) => {
-    setUser(""); // Clear the user state
-    callback && callback(); // Optional callback function
+  const logout = async (callback) => {
+    window.localStorage.removeItem("username");
+    dispatch({ type: LOGOUT });
+    callback();
   };
-  // Value object for the context provider
-  const value = { user, signin, signout };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider
+      value={{
+        ...state,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
 
-// Custom hook to use the auth context
+export { AuthContext, AuthProvider };
+
 export function useAuth() {
   return useContext(AuthContext);
 }

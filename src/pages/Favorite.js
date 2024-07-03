@@ -1,7 +1,7 @@
 import React from "react";
 
 import Grid from "@mui/material/Grid";
-import MCard from "../components/MCard";
+import MovieCard from "../components/MovieCard";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 
@@ -20,7 +20,7 @@ function FavoritePage() {
       <Grid container direction="row" spacing={5} mt={2}>
         {list?.map((item) => (
           <Grid key={item.id} item xs={6} sm={4} md={3}>
-            <MCard item={item} />
+            <MovieCard item={item} />
           </Grid>
         ))}
       </Grid>

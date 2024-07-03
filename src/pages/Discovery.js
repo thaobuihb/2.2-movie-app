@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import apiService from "../api/apiServices";
-import { API_KEY } from "../api/config";
+import apiService from "../app/apiService";
+import { API_KEY } from "../app/config";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
-import MCard from "../components/MCard";
+import MCard from "../components/MovieCard";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import Pagination from "@mui/material/Pagination";

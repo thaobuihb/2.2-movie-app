@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
-import apiService from "../api/apiServices";
-import { API_KEY } from "../api/config";
+import apiService from "../app/apiService";
+import { API_KEY } from "../app/config";
 import Grid from "@mui/material/Grid";
-import MCard from "./MCard";
+import MovieCard from "./MovieCard";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -12,12 +12,12 @@ import ListItemButton from "@mui/material/ListItemButton";
 import Skeleton from "@mui/material/Skeleton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 const yearList = [
+  { id: 1999, label: "1999" },
+  { id: 1998, label: "1998" },
+  { id: 1997, label: "1997" },
+  { id: 1996, label: "1996" },
+  { id: 2009, label: "2009" },
   { id: 2000, label: "2000" },
-  { id: 2010, label: "2010" },
-  { id: 2020, label: "2020" },
-  { id: 2021, label: "2021" },
-  { id: 2022, label: "2022" },
-  { id: 2023, label: "2023" },
 ];
 export default function Category() {
   const [openYear, setOpenYear] = React.useState(false);
@@ -26,7 +26,7 @@ export default function Category() {
   const [genresList, setGenresList] = React.useState([]);
   const [movieList, setMovieList] = React.useState([]);
   const [genreId, setGenreId] = React.useState();
-  const [yearId, setYearId] = React.useState(2000);
+  const [yearId, setYearId] = React.useState(1999);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,16 +77,15 @@ export default function Category() {
   return (
     <>
       <Typography variant="h5" my={3}>
-        CATEGORY
+        DISCOVER
       </Typography>
 
       <Divider />
-      <Stack flexDirection="row" width="100%" justifyContent="space-between">
+      <Stack flexDirection="column" width="100%" justifyContent="space-between">
         <Stack minWidth="150px" width={{ xs: "10%" }}>
           {/* Genres-------- */}
           <Box>
             <ListItemButton
-              alignItems="flex-start"
               onClick={() => setOpenGenres(!openGenres)}
               sx={{
                 pr: 2,
@@ -132,7 +131,7 @@ export default function Category() {
                   sx={{
                     py: 0,
                     minHeight: 40,
-                    color: "rgba(255,255,255,.8)",
+                    color: "black",
                     "&:focus": {
                       backgroundColor: "rgba(225,0,0,0.1)",
                     },
@@ -176,7 +175,7 @@ export default function Category() {
                   noWrap: true,
                   fontSize: 12,
                   lineHeight: "16px",
-                  color: openYear ? "rgba(0,0,0,0)" : "rgba(255,255,255,0.5)",
+                  color: openYear ? "black" : "rgba(255,255,255,0.5)",
                 }}
                 sx={{ my: 0 }}
               />
@@ -194,7 +193,7 @@ export default function Category() {
                 <ListItemButton
                   onClick={() => setYearId(item.id)}
                   key={item.id}
-                  sx={{ py: 0, minHeight: 40, color: "rgba(255,255,255,.8)" }}
+                  sx={{ py: 0, minHeight: 40, color: "black" }}
                 >
                   <ListItemText
                     primary={item.label}
@@ -218,7 +217,7 @@ export default function Category() {
               ))
             : movieList.map((item) => (
                 <Grid item xs={10} sm={6} md={4} lg={3}>
-                  <MCard key={item.id} item={item} />
+                  <MovieCard key={item.id} item={item} />
                 </Grid>
               ))}
         </Grid>

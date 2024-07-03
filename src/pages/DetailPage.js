@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import apiService from "../api/apiServices";
-import { API_KEY } from "../api/config";
+import apiService from "../app/apiService";
+import { API_KEY } from "../app/config";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
-import MDetailCard from "../components/MDetailCard";
+import MovieDetailCard from "../components/MovieDetailCard";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -38,7 +38,7 @@ function MovieItemPage() {
       </Typography>
       <Divider />
 
-      <MDetailCard movieDetail={movieDetail} loading={loading} />
+      <MovieDetailCard movieDetail={movieDetail} loading={loading} />
     </>
   );
 }

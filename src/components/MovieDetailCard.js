@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+// import apiService from "../api/apiService";
+// import { API_KEY } from "../api/config";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
@@ -8,43 +9,51 @@ import Avatar from "@mui/material/Avatar";
 import RecommendIcon from "@mui/icons-material/Recommend";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import Divider from "@mui/material/Divider";
+import { useParams } from "react-router-dom";
 import StarIcon from "@mui/icons-material/Star";
 import IconButton from "@mui/material/IconButton";
 import Skeleton from "@mui/material/Skeleton";
+// import VideoPlayer from "./VideoPlayer";
 
 function MDetailCard({ movieDetail, loading }) {
-  const { movieId } = useParams();
-  const [movieError, setMovieError] = useState();
-  const [isFavorited, setIsFavorited] = useState(false);
+  let { movieId } = useParams();
+  const [movieError, setmovieError] = useState();
 
-  const toggleFavorite = () => {
-    let list = JSON.parse(localStorage.getItem("fav")) || [];
+  const addFavMovie = (title, poster, voteA, voteC, id) => {
+    let list = JSON.parse(localStorage.getItem("fav"));
+    if (list) {
+      let itemId;
+      for (let i = 0; i < list.length; i++) {
+        itemId = list[i].movie.id;
+      }
+      if (itemId.includes(movieId)) {
+        setmovieError("You had this item!");
+      } else {
+        list.push({
+          id: id,
+          original_title: title,
+          poster_path: poster,
+          vote_average: voteA,
+          vote_count: voteC,
+        });
 
-    // Check if movieId exists in localStorage
-    const index = list.findIndex((item) => item.id === movieId);
-
-    if (index === -1) {
-      // Not found, add to favorites
-      list.push({
-        id: movieId,
-        original_title: movieDetail.original_title,
-        poster_path: movieDetail.poster_path,
-        vote_average: movieDetail.vote_average,
-        vote_count: movieDetail.vote_count,
-      });
-
-      localStorage.setItem("fav", JSON.stringify(list));
-      setMovieError("Added to favorites!");
-      setIsFavorited(true);
+        localStorage.setItem("fav", JSON.stringify(list));
+        setmovieError("Added!");
+      }
     } else {
-      // Found, remove from favorites
-      list = list.filter((item) => item.id !== movieId);
+      localStorage.setItem("fav", JSON.stringify([]));
+      list = JSON.parse(localStorage.getItem("fav"));
+      list.push({
+        id: id,
+        original_title: title,
+        poster_path: poster,
+        vote_average: voteA,
+        vote_count: voteC,
+      });
       localStorage.setItem("fav", JSON.stringify(list));
-      setMovieError("Removed from favorites!");
-      setIsFavorited(false);
+      setmovieError("Added!");
     }
   };
-
   const detailSkeleton = (
     <Stack spacing={1}>
       <Skeleton variant="text" />
@@ -52,7 +61,6 @@ function MDetailCard({ movieDetail, loading }) {
       <Skeleton variant="rectangular" width="100%" height={300} />
     </Stack>
   );
-
   return (
     <>
       {loading ? (
@@ -97,11 +105,19 @@ function MDetailCard({ movieDetail, loading }) {
               </Typography>
               <Stack flexDirection="column" alignItems="end">
                 <IconButton
-                  onClick={toggleFavorite}
+                  onClick={() =>
+                    addFavMovie(
+                      movieDetail.original_title,
+                      movieDetail.poster_path,
+                      movieDetail.vote_average,
+                      movieDetail.vote_count,
+                      movieId
+                    )
+                  }
                   size="large"
                   children={<StarIcon fontSize="large" />}
                   sx={{
-                    backgroundColor: isFavorited ? "rgba(225,0,0,0.9)" : "rgba(123, 255, 119, 0.4)",
+                    backgroundColor: "rgba(225,0,0,0.9)",
                     marginRight: "30px",
                   }}
                 />
@@ -198,6 +214,11 @@ function MDetailCard({ movieDetail, loading }) {
                   {`${movieDetail.vote_average}`}
                 </Typography>
               </Box>
+              <Stack>
+                {/* {movieDetail.videos.results?.map((item) => (
+                  <VideoPlayer linkKey={item.key} />
+                ))} */}
+              </Stack>
             </Stack>
           </Stack>
         </Stack>

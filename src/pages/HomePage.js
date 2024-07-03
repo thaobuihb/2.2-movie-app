@@ -1,30 +1,37 @@
-import React, { useEffect, useState } from "react";
-import apiService from "../api/apiServices";
-import { API_KEY } from "../api/config";
+import React, { useState, useEffect } from "react";
+
+import TrendingMovieList from "../components/TrendingMovieList";
+
+import apiService from "../app/apiService";
+import { API_KEY } from "../app/config";
+
 import Grid from "@mui/material/Grid";
-import TrendingCardGroup from "../components/TrendingCardGroup";
 import Category from "../components/Category";
 
 function HomePage() {
-  const [loadingTrending, setLoadingTrending] = useState();
-  const [trendingList, setTrendingList] = useState([]);
+  const [trendingMovies, setTrendingMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [cutInitial, setcutInitial] = useState();
+
   useEffect(() => {
-    const fetchData = async () => {
+    const getData = async () => {
+      setLoading(true);
       try {
-        setLoadingTrending(true);
         const res = await apiService.get(
           `/trending/all/day?api_key=${API_KEY}`
         );
         const result = res.data.results;
-        setTrendingList(result);
+        setTrendingMovies(result);
         setcutInitial([...result].splice(16, 4));
-        setLoadingTrending(false);
-      } catch (e) {
-        console.log(e.message);
+        setError("");
+      } catch (error) {
+        console.log(error);
+        setError(error.message);
       }
+      setLoading(false);
     };
-    fetchData();
+    getData();
   }, []);
 
   return (
@@ -38,14 +45,14 @@ function HomePage() {
         }}
       >
         <Grid item direction="column" container>
-          <TrendingCardGroup
-            trendingList={trendingList}
+          <TrendingMovieList
+            trendingMovies={trendingMovies}
             cutInitial={cutInitial}
-            loadingTrending={loadingTrending}
+            loading={loading}
           />
         </Grid>
 
-        <Grid item direction="column" mt={4} container>
+        <Grid item direction="column" mt={5} container>
           <Category />
         </Grid>
       </Grid>
