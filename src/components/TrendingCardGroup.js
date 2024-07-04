@@ -6,35 +6,33 @@ import Typography from "@mui/material/Typography";
 import PaginationItem from "@mui/material/PaginationItem";
 import Divider from "@mui/material/Divider";
 import Skeleton from "@mui/material/Skeleton";
+import apiService from "../api/apiServices";
 import "./TrendingCardGroup.css"; // Import CSS riêng cho trending
-import { API_KEY, BASE_URL } from "../api/config";
+import { API_KEY } from "../api/config";
+
 
 function TrendingCardGroup() {
   const [trendingList, setTrendingList] = useState([]);
   const [loadingTrending, setLoadingTrending] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [cutInitial, setcutInitial] = useState();
   const itemsPerPage = 2;
 
   useEffect(() => {
     const fetchTrending = async () => {
       try {
-        const response = await fetch(
-          `${BASE_URL}/trending/movie/day?language=en-US&api_key=${API_KEY}`
+        setLoadingTrending(true);
+        const res = await apiService.get(
+          `/trending/all/day?api_key=${API_KEY}`
         );
-        if (response.ok) {
-          const data = await response.json();
-          setTrendingList(data.results);
-          setLoadingTrending(false);
-        } else {
-          setLoadingTrending(false);
-          console.error("Failed to fetch trending movies");
-        }
-      } catch (error) {
+        const result = res.data.results;
+        setTrendingList(result);
+        setcutInitial([...result].splice(16, 4));
         setLoadingTrending(false);
-        console.error("Error fetching trending movies:", error);
+      } catch (e) {
+        console.log(e.message);
       }
     };
-
     fetchTrending();
   }, []);
 

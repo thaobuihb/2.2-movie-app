@@ -6,7 +6,7 @@
   }
   
   .trending-card .MuiCard-root {
-    width: 150%;
-    max-width: 500px; /* Đặt kích thước lớn hơn cho thẻ trending */
+    width: 180%;
+    max-width: 600px; /* Đặt kích thước lớn hơn cho thẻ trending */
     height: auto;
   }

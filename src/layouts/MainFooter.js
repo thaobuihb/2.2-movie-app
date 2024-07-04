@@ -5,7 +5,7 @@ function MainFooter() {
   return (
     <Typography
       variant="body2"
-      color="text.secondary"
+      color="secondary"
       align="center"
       p={1}
       mt={2}
