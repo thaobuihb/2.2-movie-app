@@ -10,12 +10,11 @@ import apiService from "../api/apiServices";
 import "./TrendingCardGroup.css"; // Import CSS riêng cho trending
 import { API_KEY } from "../api/config";
 
-
 function TrendingCardGroup() {
   const [trendingList, setTrendingList] = useState([]);
   const [loadingTrending, setLoadingTrending] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [cutInitial, setcutInitial] = useState();
+  const [cutInitial, setCutInitial] = useState([]); // Initialize as empty array
   const itemsPerPage = 2;
 
   useEffect(() => {
@@ -27,14 +26,20 @@ function TrendingCardGroup() {
         );
         const result = res.data.results;
         setTrendingList(result);
-        setcutInitial([...result].splice(16, 4));
+        // Update cutInitial here
+        setCutInitial([...result].splice(16, 4));
         setLoadingTrending(false);
       } catch (e) {
         console.log(e.message);
       }
     };
     fetchTrending();
-  }, []);
+  }, []); // Empty dependency array means it runs once on mount
+
+  useEffect(() => {
+    // Example of how to use cutInitial
+    console.log("cutInitial:", cutInitial);
+  }, [cutInitial]); // Add cutInitial as a dependency if you need to use it in another effect
 
   const getDisplayedItems = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
