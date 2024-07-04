@@ -6,21 +6,51 @@ import Typography from "@mui/material/Typography";
 import PaginationItem from "@mui/material/PaginationItem";
 import Divider from "@mui/material/Divider";
 import Skeleton from "@mui/material/Skeleton";
+import apiService from "../api/apiServices";
 import "./TrendingCardGroup.css"; // Import CSS riêng cho trending
+import { API_KEY } from "../api/config";
 
-function TrendingCardGroup({ trendingList, loadingTrending }) {
+function TrendingCardGroup() {
+  const [trendingList, setTrendingList] = useState([]);
+  const [loadingTrending, setLoadingTrending] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [cutInitial, setCutInitial] = useState([]); // Initialize as empty array
   const itemsPerPage = 2;
+
+  useEffect(() => {
+    const fetchTrending = async () => {
+      try {
+        setLoadingTrending(true);
+        const res = await apiService.get(
+          `/trending/all/day?api_key=${API_KEY}`
+        );
+        const result = res.data.results;
+        setTrendingList(result);
+        // Update cutInitial here
+        setCutInitial([...result].splice(16, 4));
+        setLoadingTrending(false);
+      } catch (e) {
+        console.log(e.message);
+      }
+    };
+    fetchTrending();
+  }, []); // Empty dependency array means it runs once on mount
+
+  useEffect(() => {
+    // Example of how to use cutInitial
+    console.log("cutInitial:", cutInitial);
+  }, [cutInitial]); // Add cutInitial as a dependency if you need to use it in another effect
 
   const getDisplayedItems = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return trendingList.slice(startIndex, startIndex + itemsPerPage);
   };
 
-  useEffect(() => {
-    // Reset page to 1 whenever trendingList changes
-    setCurrentPage(1);
-  }, [trendingList]);
+  const handleNextPage = () => {
+    setCurrentPage((prev) =>
+      prev * itemsPerPage >= trendingList.length ? 1 : prev + 1
+    );
+  };
 
   const placeholder = [0, 1];
   const detailSkeleton = (
@@ -40,14 +70,7 @@ function TrendingCardGroup({ trendingList, loadingTrending }) {
         <Typography variant="h5" my={3}>
           TRENDING
         </Typography>
-        <PaginationItem
-          type="next"
-          onClick={() =>
-            setCurrentPage((prev) =>
-              prev * itemsPerPage >= trendingList.length ? 1 : prev + 1
-            )
-          }
-        />
+        <PaginationItem type="next" onClick={handleNextPage} />
       </Stack>
       <Divider />
       <Grid container justifyContent="center" spacing={3} mt={2}>
@@ -59,7 +82,7 @@ function TrendingCardGroup({ trendingList, loadingTrending }) {
             ))
           : getDisplayedItems().map((item) => (
               <Grid key={item.id} item xs={12} md={6}>
-                <div className="trending-card"> {/* Div bọc thẻ trending */}
+                <div className="trending-card">
                   <MCard item={item} />
                 </div>
               </Grid>

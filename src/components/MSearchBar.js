@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import SearchIcon from "@mui/icons-material/Search";
+import { useMovie } from "../contexts/MovieContext";
 import { styled, alpha } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
-import SearchIcon from "@mui/icons-material/Search";
-import { Box, Typography, List, ListItem, ListItemText } from "@mui/material";
-import apiService from "../api/apiServices";
-import { API_KEY } from "../api/config";
+import { useNavigate } from "react-router-dom";
+import Button from "@mui/material/Button";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -13,11 +13,10 @@ const Search = styled("div")(({ theme }) => ({
   "&:hover": {
     backgroundColor: alpha(theme.palette.common.white, 0.25),
   },
-  marginRight: theme.spacing(2),
   marginLeft: 0,
   width: "100%",
   [theme.breakpoints.up("sm")]: {
-    marginLeft: theme.spacing(3),
+    marginLeft: theme.spacing(1),
     width: "auto",
   },
 }));
@@ -47,63 +46,44 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 function MSearchBar() {
   const [query, setQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { searchMovies } = useMovie();
+  const navigate = useNavigate();
 
-  const handleInputChange = (event) => {
-    setQuery(event.target.value);
+  const handleInputChange = (e) => {
+    setQuery(e.target.value);
   };
 
-  const handleSearch = async (event) => {
-    debugger
-    event.preventDefault();
-    setLoading(true);
-    setError(null);
+  const handleSearch = () => {
+    searchMovies(query).then(() => {
+      navigate("/"); // Điều hướng về trang chủ sau khi tìm kiếm
+    });
+  };
 
-    try {
-      const response = await apiService.get("/search/movie", {
-        params: {
-          api_key: API_KEY,
-          query: query,
-        },
-      });
-      setSearchResults(response.data.results);
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
     }
   };
 
+  useEffect(() => {
+    // Reset query when navigating away from search page
+    return () => setQuery("");
+  }, []);
+
   return (
-    <Box>
-      <Search component="form" onSubmit={() => handleSearch}>
-        <SearchIconWrapper>
-          <SearchIcon />
-        </SearchIconWrapper>
-        <StyledInputBase
-          placeholder="Search…"
-          inputProps={{ "aria-label": "search" }}
-          value={query}
-          onChange={handleInputChange}
-        />
-      </Search>
-
-      {loading && <Typography>Loading...</Typography>}
-      {error && <Typography color="error">{error}</Typography>}
-
-      <List>
-        {searchResults.map((movie) => (
-          <ListItem key={movie.id}>
-            <ListItemText
-              primary={movie.title}
-              secondary={movie.release_date}
-            />
-          </ListItem>
-        ))}
-      </List>
-    </Box>
+    <Search>
+      <SearchIconWrapper>
+        <SearchIcon />
+      </SearchIconWrapper>
+      <StyledInputBase
+        placeholder="Search…"
+        inputProps={{ "aria-label": "search" }}
+        value={query}
+        onChange={handleInputChange}
+        onKeyPress={handleKeyPress}
+      />
+      <Button onClick={handleSearch}>Search</Button>
+    </Search>
   );
 }
 
