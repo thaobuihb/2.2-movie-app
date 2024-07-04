@@ -9,17 +9,17 @@ import Menu from "@mui/material/Menu";
 import MSearchBar from "../components/MSearchBar";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MoreIcon from "@mui/icons-material/MoreVert";
-import CameraIndoorIcon from '@mui/icons-material/CameraIndoor';
+import CameraIndoorIcon from "@mui/icons-material/CameraIndoor";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import StarIcon from "@mui/icons-material/Star";
 import { useAuth } from "../contexts/AuthContext";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function PrimarySearchAppBar() {
-  let location = useLocation();
   let auth = useAuth();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+  const navigate = useNavigate();
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -82,7 +82,6 @@ export default function PrimarySearchAppBar() {
           color="inherit"
           component={Link}
           to="/form"
-          state={{ backgroundLocation: location, from: location }}
           onClick={handleMenuClose}
         >
           Login
@@ -131,7 +130,6 @@ export default function PrimarySearchAppBar() {
       <MenuItem component={Link} to="/form">
         <IconButton
           size="large"
-          //cool styling ui props
           aria-label="account of current user"
           aria-controls={menuId}
           disableRipple={true}
@@ -154,6 +152,7 @@ export default function PrimarySearchAppBar() {
             color="inherit"
             component={Link}
             to="/"
+            onClick={() => navigate("/")}
             children={<CameraIndoorIcon />}
           />
           <MSearchBar />

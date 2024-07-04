@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { MovieContext } from "../contexts/MovieContext";
 
 const useMovie = () => {
-  const { state, setState } = useContext(MovieContext);
+  const { state, setState, searchMovies } = useContext(MovieContext);
 
   function setMovie(data) {
     setState((prevState) => ({
@@ -13,6 +13,7 @@ const useMovie = () => {
 
   return {
     setMovie,
+    searchMovies,
     movieList: state.movieList, 
     isLoading: state.isLoading,
   };
